@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIGODE ANONIMO — Perguntas Anônimas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* Tema escuro de alto contraste: preto/grafite com verde neon, azul e dourado */
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top, #0b192c 0%, #09090b 52%, #050507 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+    .brand-gradient {
+      background: linear-gradient(135deg, #00ff88 0%, #0ea5e9 55%, #f59e0b 100%);
+    }
+    .card-surface-gradient {
+      background: linear-gradient(145deg, #052e2b 0%, #0c2340 52%, #1e1b0b 100%);
+    }
+  </style>
+</head>
+<body class="flex flex-col justify-between selection:bg-emerald-400 selection:text-zinc-950">
+  <!-- Notificações flutuantes -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-xs pointer-events-none"></div>
+
+  <!-- Cabeçalho principal -->
+  <header class="w-full max-w-2xl mx-auto px-4 pt-6 pb-2 flex items-center justify-between gap-2">
+    <button
+      type="button"
+      id="brandHomeBtn"
+      class="flex items-center gap-2.5 text-left group focus:outline-none"
+    >
+      <span class="w-10 h-10 rounded-2xl brand-gradient flex items-center justify-center font-black text-zinc-950 shadow-lg shadow-emerald-500/20">
+        BA
+      </span>
+      <div>
+        <span class="block text-base font-black tracking-tight text-white">BIGODE ANONIMO</span>
+        <span class="block text-[11px] text-zinc-400">Perguntas anônimas • Insta, Face e WhatsApp</span>
+      </div>
+    </button>
+
+    <nav class="flex items-center gap-1.5 bg-zinc-900/90 border border-white/10 p-1 rounded-2xl">
+      <button
+        type="button"
+        data-tab="create"
+        class="tab-btn px-3 py-1.5 rounded-xl text-xs font-extrabold transition"
+      >
+        Criar caixinha
+      </button>
+      <button
+        type="button"
+        data-tab="inbox"
+        class="tab-btn px-3 py-1.5 rounded-xl text-xs font-extrabold transition"
+      >
+        Caixa (<span id="headerInboxCount">0</span>)
+      </button>
+    </nav>
+  </header>
+
+  <!-- Conteúdo principal -->
+  <main class="w-full max-w-2xl mx-auto px-4 py-5 space-y-6 flex-1">
+    <!-- Tela de resposta anônima via link (?u=...&q=...) -->
+    <section
+      id="replyScreen"
+      class="hidden rounded-3xl bg-zinc-950/95 border border-emerald-400/30 p-6 sm:p-7 space-y-5 shadow-2xl"
+    >
+      <div class="flex items-center justify-between gap-2">
+        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-400/15 text-emerald-300 border border-emerald-400/30">
+          BIGODE ANONIMO • Responder anonimamente
+        </span>
+        <button
+          type="button"
+          id="btnReplyToCreate"
+          class="text-xs font-bold text-sky-300 hover:text-sky-200 underline"
+        >
+          Criar a minha caixinha
+        </button>
+      </div>
+
+      <div class="rounded-3xl card-surface-gradient p-6 text-center shadow-xl border border-white/10 space-y-2">
+        <p class="text-xs font-extrabold uppercase tracking-wider text-emerald-300">
+          Caixinha de <span id="replyTargetUser" class="underline text-white">@usuario</span>
+        </p>
+        <h1 id="replyPromptText" class="text-xl sm:text-2xl font-black text-white leading-snug">
+          O QUE TEM PARA ME FALAR OU PERGUNTAR?
+        </h1>
+      </div>
+
+      <form id="anonymousReplyForm" class="space-y-4">
+        <div>
+          <label for="anonMessageInput" class="block text-sm font-bold text-zinc-200 mb-1.5">
+            Sua pergunta ou mensagem anônima
+          </label>
+          <textarea
+            id="anonMessageInput"
+            rows="4"
+            maxlength="320"
+            required
+            placeholder="Manda sua pergunta ou mensagem anônima..."
+            class="w-full px-4 py-3 rounded-2xl bg-zinc-900 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-emerald-400 resize-none"
+          ></textarea>
+        </div>
+
+        <div>
+          <label for="anonAuthorInput" class="block text-xs font-semibold text-zinc-400 mb-1.5">
+            Seu nome ou @ (fica oculto por padrão; pode ser revelado no desbloqueio)
+          </label>
+          <input
+            type="text"
+            id="anonAuthorInput"
+            maxlength="70"
+            placeholder="Ex: @pedro_silva ou João"
+            class="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-sky-400"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-3.5 px-5 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-zinc-950 font-black text-sm shadow-lg shadow-emerald-500/20 transition active:scale-95"
+        >
+          Enviar mensagem anônima no BIGODE ANONIMO
+        </button>
+      </form>
+
+      <!-- Confirmação após envio + oferta para criar a própria caixinha -->
+      <div
+        id="replySentBox"
+        class="hidden rounded-2xl bg-emerald-400/10 border border-emerald-400/35 p-5 text-center space-y-3"
+      >
+        <p class="text-base font-black text-emerald-300">
+          Mensagem anônima enviada com sucesso!
+        </p>
+        <p class="text-xs text-zinc-300">
+          Agora é a sua vez: crie e poste a sua caixinha no BIGODE ANONIMO para Instagram, Facebook ou WhatsApp e descubra quem manda mensagens.
+        </p>
+        <button
+          type="button"
+          id="btnAfterSendCreateBox"
+          class="w-full py-3 px-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-sm transition active:scale-95"
+        >
+          Criar e postar minha caixinha agora!
+        </button>
+      </div>
+    </section>
+
+    <!-- ABA 1: CRIAR CAIXINHA -->
+    <section id="createScreen" class="space-y-6">
+      <div class="rounded-3xl bg-zinc-950/95 border border-white/10 p-6 sm:p-7 space-y-5 shadow-2xl">
+        <div class="space-y-1">
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-400/15 text-emerald-300 border border-emerald-400/30">
+            BIGODE ANONIMO • Passo 1
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white pt-1">
+            Crie sua caixinha anônima
+          </h1>
+          <p class="text-sm text-zinc-400">
+            Escolha a caixinha pronta ou escreva a sua, gere o card e poste no Instagram, Facebook e WhatsApp.
+          </p>
+        </div>
+
+        <!-- Nome / @ do usuário -->
+        <div>
+          <label for="creatorNameInput" class="block text-sm font-bold text-zinc-200 mb-1.5">
+            Seu nome ou @ (identifica você no link e na caixinha)
+          </label>
+          <input
+            type="text"
+            id="creatorNameInput"
+            maxlength="50"
+            placeholder="Ex: @seu_nome ou Carlos"
+            class="w-full px-4 py-3 rounded-2xl bg-zinc-900 border border-white/10 text-white placeholder-zinc-500 text-sm font-semibold focus:outline-none focus:border-emerald-400"
+          />
+        </div>
+
+        <!-- Duas opções: pronta vs personalizada -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            type="button"
+            id="optPresetBtn"
+            class="p-4 rounded-2xl text-left border transition space-y-1.5"
+          >
+            <span class="block text-xs font-black uppercase tracking-wider text-emerald-300">
+              Opção 1 • Caixinha pronta
+            </span>
+            <span class="block text-sm font-extrabold text-white">
+              “O QUE TEM PARA ME FALAR OU PERGUNTAR?”
+            </span>
+          </button>
+
+          <button
+            type="button"
+            id="optCustomBtn"
+            class="p-4 rounded-2xl text-left border transition space-y-1.5"
+          >
+            <span class="block text-xs font-black uppercase tracking-wider text-sky-300">
+              Opção 2 • Personalizada
+            </span>
+            <span class="block text-sm font-extrabold text-white">
+              Escrever meu próprio texto na caixinha
+            </span>
+          </button>
+        </div>
+
+        <!-- Campo extra para caixinha personalizada -->
+        <div id="customPromptWrapper" class="hidden">
+          <label for="customPromptInput" class="block text-xs font-bold text-zinc-300 mb-1.5">
+            Texto da sua caixinha personalizada
+          </label>
+          <input
+            type="text"
+            id="customPromptInput"
+            maxlength="120"
+            placeholder="Ex: O que você nunca me falou?"
+            class="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-sky-400"
+          />
+        </div>
+
+        <!-- Upload de imagem de fundo do card -->
+        <div class="rounded-2xl bg-zinc-900/85 border border-white/10 p-4 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <label for="cardBgUpload" class="text-xs font-bold text-zinc-200">
+              Imagem de fundo para postar no Insta / Face / WhatsApp (opcional)
+            </label>
+            <button
+              type="button"
+              id="btnClearCardBg"
+              class="text-xs font-bold text-amber-300 hover:text-amber-200 underline"
+            >
+              Usar padrão
+            </button>
+          </div>
+          <input
+            type="file"
+            id="cardBgUpload"
+            accept="image/*"
+            class="block w-full text-xs text-zinc-400 file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-extrabold file:bg-emerald-400/20 file:text-emerald-200 hover:file:bg-emerald-400/30 cursor-pointer"
+          />
+        </div>
+      </div>
+
+      <!-- Prévia visual do card para Instagram / Facebook / WhatsApp -->
+      <div class="rounded-3xl bg-zinc-950/95 border border-white/10 p-6 space-y-4 shadow-2xl">
+        <div class="flex items-center justify-between gap-2">
+          <h2 class="text-base font-black text-white">Prévia da imagem — BIGODE ANONIMO</h2>
+          <span class="text-xs font-bold text-amber-300">Insta • Face • WhatsApp</span>
+        </div>
+
+        <div
+          id="shareCardPreview"
+          class="relative overflow-hidden rounded-3xl card-surface-gradient p-6 sm:p-8 text-center shadow-xl border border-white/15"
+        >
+          <img
+            id="shareCardBgImg"
+            alt="Imagem de fundo da caixinha BIGODE ANONIMO"
+            class="hidden absolute inset-0 w-full h-full object-cover opacity-35 pointer-events-none"
+          />
+          <div class="relative z-10 space-y-3">
+            <span class="inline-block px-3 py-1 rounded-full bg-black/50 text-emerald-300 border border-emerald-400/30 text-xs font-extrabold">
+              BIGODE ANONIMO • <span id="previewUserName" class="text-white">@seu_nome</span>
+            </span>
+            <p id="previewPromptText" class="text-xl sm:text-2xl font-black text-white drop-shadow">
+              O QUE TEM PARA ME FALAR OU PERGUNTAR?
+            </p>
+            <div class="inline-block px-4 py-2 rounded-2xl bg-emerald-400 text-zinc-950 font-black text-xs shadow">
+              Toque no link para enviar sua pergunta anônima
+            </div>
+          </div>
+        </div>
+
+        <!-- Link direto gerado -->
+        <div class="space-y-2.5">
+          <label for="generatedLinkInput" class="block text-xs font-bold text-zinc-400">
+            Seu link direto da caixinha no BIGODE ANONIMO
+          </label>
+          <div class="flex gap-2">
+            <input
+              type="text"
+              id="generatedLinkInput"
+              readonly
+              class="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-emerald-300 font-mono text-xs"
+            />
+            <button
+              type="button"
+              id="btnCopyShareLink"
+              class="px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-zinc-950 font-extrabold text-xs shrink-0 transition active:scale-95"
+            >
+              Copiar link
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          <button
+            type="button"
+            id="btnDownloadCard"
+            class="py-3 px-4 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-zinc-950 font-black text-xs shadow-lg shadow-emerald-500/20 transition active:scale-95"
+          >
+            Baixar imagem PNG
+          </button>
+          <button
+            type="button"
+            id="btnShareWaBox"
+            class="py-3 px-4 rounded-2xl bg-sky-500 hover:bg-sky-400 text-zinc-950 font-black text-xs transition active:scale-95"
+          >
+            Compartilhar WhatsApp
+          </button>
+          <button
+            type="button"
+            id="btnShareSocialInfo"
+            class="py-3 px-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs transition active:scale-95"
+          >
+            Copiar texto Insta/Face
+          </button>
+        </div>
+
+        <div class="pt-1 flex justify-end">
+          <button
+            type="button"
+            id="btnGoToInbox"
+            class="text-xs font-extrabold text-emerald-300 hover:text-emerald-200 underline"
+          >
+            Ver perguntas recebidas e desbloquear →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 2: CAIXA DE ENTRADA E PACOTES PIX (R$ 10 / R$ 15 / R$ 35 / R$ 50) -->
+    <section id="inboxScreen" class="hidden space-y-6">
+      <div class="rounded-3xl bg-zinc-950/95 border border-white/10 p-6 space-y-4 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-xl font-black text-white">
+              Caixa de perguntas de <span id="inboxOwnerLabel" class="text-emerald-400">@seu_nome</span>
+            </h2>
+            <p id="inboxUnlockSummary" class="text-xs text-zinc-400 mt-0.5">
+              Autores ocultos por padrão. Escolha um pacote Pix no BIGODE ANONIMO para revelar.
+            </p>
+          </div>
+          <span
+            id="adminPartnerBadge"
+            class="hidden px-3 py-1 rounded-full text-xs font-black bg-amber-400/20 text-amber-300 border border-amber-400/40"
+          >
+            Conta ADM Ativa
+          </span>
+        </div>
+
+        <!-- Simulador local para testes rápidos -->
+        <form id="simQuestionForm" class="rounded-2xl bg-zinc-900/90 border border-white/10 p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-sky-300">Adicionar pergunta de teste local</span>
+            <span class="text-[11px] text-zinc-500">Teste rápido</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input
+              type="text"
+              id="simTextInput"
+              maxlength="240"
+              placeholder="Ex: Qual seu maior sonho?"
+              class="px-3 py-2 rounded-xl bg-zinc-950 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-emerald-400"
+            />
+            <input
+              type="text"
+              id="simAuthorInput"
+              maxlength="60"
+              placeholder="Nome oculto (ex: @lucas_m)"
+              class="px-3 py-2 rounded-xl bg-zinc-950 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-sky-400"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full py-2 px-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold text-xs border border-white/10 transition"
+          >
+            + Adicionar pergunta de teste
+          </button>
+        </form>
+      </div>
+
+      <!-- Planos Pix: R$ 10 / R$ 15 / R$ 35 / R$ 50 -->
+      <div class="rounded-3xl bg-zinc-950/95 border border-white/10 p-6 space-y-4 shadow-2xl">
+        <div class="space-y-1">
+          <h3 class="text-lg font-black text-white">Desbloquear autores e Conta ADM • Pix</h3>
+          <p class="text-xs text-zinc-400">
+            Copie a chave Pix, faça o pagamento e envie o comprovante/extrato no WhatsApp.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- R$ 10: 1 pergunta específica -->
+          <div class="rounded-2xl bg-zinc-900 border border-white/10 p-4 flex flex-col justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-emerald-300">1 pergunta específica</span>
+                <span class="text-base font-black text-emerald-400">R$ 10</span>
+              </div>
+              <p class="text-xs text-zinc-400">
+                Veja quem mandou uma pergunta específica da sua caixa.
+              </p>
+            </div>
+            <button
+              type="button"
+              data-plan="10"
+              class="open-plan-btn w-full py-2.5 px-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-zinc-950 font-black text-xs transition active:scale-95"
+            >
+              Ver 1 específica por R$ 10
+            </button>
+          </div>
+
+          <!-- R$ 15: 2 perguntas -->
+          <div class="rounded-2xl bg-zinc-900 border border-white/10 p-4 flex flex-col justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-sky-300">Desbloquear 2 perguntas</span>
+                <span class="text-base font-black text-sky-400">R$ 15</span>
+              </div>
+              <p class="text-xs text-zinc-400">
+                Revele o autor de até 2 perguntas anônimas.
+              </p>
+            </div>
+            <button
+              type="button"
+              data-plan="15"
+              class="open-plan-btn w-full py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-zinc-950 font-black text-xs transition active:scale-95"
+            >
+              Desbloquear 2 por R$ 15
+            </button>
+          </div>
+
+          <!-- R$ 35: Todas as mensagens -->
+          <div class="rounded-2xl bg-zinc-900 border border-white/10 p-4 flex flex-col justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-emerald-300">Todas as mensagens</span>
+                <span class="text-base font-black text-emerald-400">R$ 35</span>
+              </div>
+              <p class="text-xs text-zinc-400">
+                Desbloqueia os autores de todas as perguntas recebidas.
+              </p>
+            </div>
+            <button
+              type="button"
+              data-plan="35"
+              class="open-plan-btn w-full py-2.5 px-3 rounded-xl brand-gradient hover:opacity-95 text-zinc-950 font-black text-xs transition active:scale-95"
+            >
+              Desbloquear todas por R$ 35
+            </button>
+          </div>
+
+          <!-- R$ 50: Conta ADM e ganhar dinheiro -->
+          <div class="rounded-2xl bg-zinc-900 border border-amber-400/40 p-4 flex flex-col justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-amber-300">Conta ADM & Lucros</span>
+                <span class="text-base font-black text-amber-400">R$ 50</span>
+              </div>
+              <p class="text-xs text-zinc-400">
+                Adquira conta ADM no BIGODE ANONIMO e ganhe dinheiro.
+              </p>
+            </div>
+            <button
+              type="button"
+              data-plan="50"
+              class="open-plan-btn w-full py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs transition active:scale-95"
+            >
+              Adquirir conta ADM por R$ 50
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de perguntas recebidas -->
+      <div class="rounded-3xl bg-zinc-950/95 border border-white/10 p-6 space-y-4 shadow-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-black text-white">Perguntas recebidas</h3>
+          <span id="inboxListCount" class="text-xs font-bold px-3 py-1 rounded-full bg-zinc-900 text-zinc-300 border border-white/10">
+            0 perguntas
+          </span>
+        </div>
+        <div id="inboxQuestionsContainer" class="space-y-3"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Rodapé discreto com pontinho escondido para login do ADM -->
+  <footer class="w-full max-w-2xl mx-auto px-4 py-5 flex items-center justify-between text-[11px] text-zinc-600">
+    <span>BIGODE ANONIMO • Anônimo & Seguro</span>
+    <button
+      type="button"
+      id="hiddenAdminDot"
+      aria-label="Acesso administrativo"
+      title="•"
+      class="w-2 h-2 rounded-full bg-zinc-800/70 hover:bg-emerald-400/80 transition focus:outline-none"
+    ></button>
+  </footer>
+
+  <!-- MODAL 1: Checkout Pix (R$ 10 / R$ 15 / R$ 35 / R$ 50) + Comprovante WhatsApp -->
+  <div
+    id="pixCheckoutModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="w-full max-w-md rounded-3xl bg-zinc-900 border border-white/15 p-6 space-y-4 shadow-2xl my-6">
+      <div class="flex items-center justify-between">
+        <h3 id="pixModalTitle" class="text-lg font-black text-white">Pagamento Pix • BIGODE ANONIMO</h3>
+        <button type="button" id="closePixCheckoutModal" class="text-zinc-400 hover:text-white text-lg px-2">✕</button>
+      </div>
+
+      <div class="rounded-2xl bg-zinc-950 border border-emerald-400/30 p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <span id="pixPlanLabel" class="text-xs font-bold text-zinc-300">Plano selecionado</span>
+          <span id="pixAmountBadge" class="text-xl font-black text-emerald-400">R$ 10,00</span>
+        </div>
+
+        <!-- Seletor quando for R$ 10 (1 pergunta específica) -->
+        <div id="specificQuestionSelectWrap" class="hidden space-y-1">
+          <label for="specificQuestionSelect" class="block text-xs font-bold text-emerald-300">
+            Escolha qual pergunta específica você quer ver quem mandou:
+          </label>
+          <select
+            id="specificQuestionSelect"
+            class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/15 text-white text-xs focus:outline-none focus:border-emerald-400"
+          ></select>
+        </div>
+
+        <div>
+          <label for="checkoutPixKeyInput" class="block text-xs font-semibold text-zinc-400 mb-1">
+            Chave Pix (copiar e colar no seu banco)
+          </label>
+          <div class="flex gap-2">
+            <input
+              type="text"
+              id="checkoutPixKeyInput"
+              readonly
+              class="flex-1 min-w-0 px-3 py-2 rounded-xl bg-zinc-900 border border-white/10 text-amber-300 font-mono text-xs"
+            />
+            <button
+              type="button"
+              id="btnCopyCheckoutPix"
+              class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs shrink-0"
+            >
+              Copiar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-xs text-zinc-300 leading-relaxed">
+        Após pagar via Pix, envie o <strong class="text-white">extrato/comprovante</strong> no WhatsApp para liberação.
+      </p>
+
+      <a
+        id="btnSendWhatsappProof"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="w-full py-3 px-4 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-zinc-950 font-black text-sm flex items-center justify-center gap-2 transition"
+      >
+        Enviar comprovante no WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Login do ADM (Bigode / Leo.221904 ou ADM parceiro) -->
+  <div
+    id="adminLoginModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="w-full max-w-sm rounded-3xl bg-zinc-900 border border-white/15 p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-black text-white">Login ADM • BIGODE ANONIMO</h3>
+        <button type="button" id="closeAdminLoginModal" class="text-zinc-400 hover:text-white text-lg px-2">✕</button>
+      </div>
+
+      <form id="adminLoginForm" class="space-y-3.5">
+        <div>
+          <label for="adminUserField" class="block text-xs font-bold text-zinc-300 mb-1">Usuário</label>
+          <input
+            type="text"
+            id="adminUserField"
+            required
+            class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-400"
+          />
+        </div>
+        <div>
+          <label for="adminPassField" class="block text-xs font-bold text-zinc-300 mb-1">Senha</label>
+          <input
+            type="password"
+            id="adminPassField"
+            required
+            class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-white/10 text-white text-sm focus:outline-none focus:border-sky-400"
+          />
+        </div>
+        <p id="adminLoginErrorMsg" class="hidden text-xs font-bold text-rose-400">
+          Usuário ou senha inválidos.
+        </p>
+        <button
+          type="submit"
+          class="w-full py-2.5 px-4 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-zinc-950 font-black text-sm"
+        >
+          Entrar no painel ADM
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Painel ADM Completo -->
+  <div
+    id="adminPanelModal"
+    class="fixed inset-0 z-50 hidden items-start justify-center p-4 bg-black/85 backdrop-blur-sm overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="w-full max-w-2xl rounded-3xl bg-zinc-900 border border-white/15 p-6 space-y-6 my-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3.5 gap-2">
+        <div>
+          <h3 class="text-lg font-black text-white">Painel ADM — BIGODE ANONIMO</h3>
+          <p class="text-xs text-zinc-400">
+            Logado como: <strong id="loggedAdminLabel" class="text-emerald-300">Bigode</strong>
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            id="btnLogoutAdminPanel"
+            class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-zinc-300"
+          >
+            Sair
+          </button>
+          <button type="button" id="closeAdminPanelModal" class="text-zinc-400 hover:text-white text-lg px-2">✕</button>
+        </div>
+      </div>
+
+      <!-- Resumo de lucros e comissão da árvore de afiliados -->
+      <div id="affiliateSummaryBox" class="rounded-2xl bg-zinc-950 border border-amber-400/30 p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="rounded-xl bg-zinc-900 p-3 border border-white/5">
+          <span class="block text-[11px] text-zinc-400">Lucro bruto dos parceiros</span>
+          <strong id="totalPartnerGrossEl" class="text-base font-black text-white">R$ 0,00</strong>
+        </div>
+        <div class="rounded-xl bg-zinc-900 p-3 border border-white/5">
+          <span class="block text-[11px] text-zinc-400">Sua comissão (rede/afiliados)</span>
+          <strong id="totalCommissionEl" class="text-base font-black text-emerald-400">R$ 0,00</strong>
+        </div>
+        <div class="rounded-xl bg-zinc-900 p-3 border border-white/5">
+          <span class="block text-[11px] text-zinc-400">Contas ADM ativas</span>
+          <strong id="totalPartnerCountEl" class="text-base font-black text-amber-300">0</strong>
+        </div>
+      </div>
+
+      <!-- Configurações de Pix, WhatsApp e imagem padrão -->
+      <form id="adminSettingsForm" class="rounded-2xl bg-zinc-950 border border-white/10 p-4 space-y-3.5">
+        <h4 class="text-sm font-black text-white">Configurações de Pix, WhatsApp e Card Padrão</h4>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="adminPixInput" class="block text-xs font-bold text-zinc-400 mb-1">Chave Pix</label>
+            <input
+              type="text"
+              id="adminPixInput"
+              placeholder="Sua chave Pix"
+              class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/10 text-white text-xs focus:outline-none focus:border-emerald-400"
+            />
+          </div>
+          <div>
+            <label for="adminWhatsappInput" class="block text-xs font-bold text-zinc-400 mb-1">WhatsApp comprovantes (só números)</label>
+            <input
+              type="text"
+              id="adminWhatsappInput"
+              placeholder="Ex: 5511999999999"
+              class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/10 text-white text-xs focus:outline-none focus:border-sky-400"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label for="adminDefaultBgUpload" class="block text-xs font-bold text-zinc-400">
+            Imagem padrão da caixinha BIGODE ANONIMO
+          </label>
+          <div class="flex items-center gap-2">
+            <input
+              type="file"
+              id="adminDefaultBgUpload"
+              accept="image/*"
+              class="block w-full text-xs text-zinc-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-zinc-800 file:text-white cursor-pointer"
+            />
+            <button
+              type="button"
+              id="btnClearAdminBg"
+              class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-zinc-300 shrink-0"
+            >
+              Limpar img
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-2.5 px-4 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-zinc-950 font-black text-xs transition"
+        >
+          Salvar configurações
+        </button>
+      </form>
+
+      <!-- Cadastro de Contas ADM Parceiras + Árvore de Afiliados -->
+      <div class="rounded-2xl bg-zinc-950 border border-white/10 p-4 space-y-4">
+        <h4 class="text-sm font-black text-white">Contas ADM Parceiras & Árvore de Afiliados</h4>
+
+        <form id="addPartnerForm" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <input
+            type="text"
+            id="partnerUsernameInput"
+            required
+            placeholder="Usuário ADM (ex: JoaoADM)"
+            class="px-3 py-2 rounded-xl bg-zinc-900 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-emerald-400"
+          />
+          <input
+            type="text"
+            id="partnerPasswordInput"
+            required
+            placeholder="Senha do parceiro"
+            class="px-3 py-2 rounded-xl bg-zinc-900 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-sky-400"
+          />
+          <input
+            type="text"
+            id="partnerUplineInput"
+            placeholder="Quem indicou / Upline (padrão: Bigode)"
+            class="px-3 py-2 rounded-xl bg-zinc-900 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-amber-400"
+          />
+          <input
+            type="number"
+            id="partnerCommissionInput"
+            min="0"
+            max="100"
+            step="1"
+            value="30"
+            placeholder="% comissão (ex: 30)"
+            class="px-3 py-2 rounded-xl bg-zinc-900 border border-white/10 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-emerald-400"
+          />
+          <button
+            type="submit"
+            class="sm:col-span-2 py-2.5 px-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-black text-xs transition"
+          >
+            + Cadastrar conta ADM parceira
+          </button>
+        </form>
+
+        <div id="adminPartnersList" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Desbloqueio / bloqueio manual de perguntas -->
+      <div class="rounded-2xl bg-zinc-950 border border-white/10 p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h4 class="text-sm font-black text-white">Desbloqueio de perguntas</h4>
+            <p class="text-[11px] text-zinc-400">
+              Usuário alvo: <strong id="adminTargetUserLabel" class="text-sky-300">@seu_nome</strong>
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              id="btnAdminUnlock1"
+              class="px-2.5 py-1 rounded-lg bg-emerald-400/20 hover:bg-emerald-400/30 text-emerald-300 font-extrabold text-[11px] border border-emerald-400/30"
+            >
+              +1 Pergunta
+            </button>
+            <button
+              type="button"
+              id="btnAdminUnlock2"
+              class="px-2.5 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 font-extrabold text-[11px] border border-sky-500/30"
+            >
+              +2 Perguntas
+            </button>
+            <button
+              type="button"
+              id="btnAdminUnlockAll"
+              class="px-2.5 py-1 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-zinc-950 font-extrabold text-[11px]"
+            >
+              Liberar Todas
+            </button>
+            <button
+              type="button"
+              id="btnAdminLockAll"
+              class="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-[11px]"
+            >
+              Bloquear Todas
+            </button>
+          </div>
+        </div>
+
+        <div id="adminUsersSelectorList" class="flex flex-wrap gap-1.5"></div>
+        <div id="adminQuestionsContainer" class="space-y-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'bigode_anonimo_v1';
+    const ADMIN_SESSION_KEY = 'bigode_anonimo_admin_session_v1';
+    const MASTER_ADMIN_USER = 'Bigode';
+    const MASTER_ADMIN_PASS = 'Leo.221904';
+    const DEFAULT_PROMPT = 'O QUE TEM PARA ME FALAR OU PERGUNTAR?';
+
+    // Estado inicial 100% limpo, sem perguntas de exemplo ou usuários de exemplo
+    const initialCleanState = {
+      pixKey: '',
+      whatsapp: '',
+      defaultCardBg: '',
+      currentUser: '',
+      mode: 'preset',
+      customPrompt: '',
+      customCardBg: '',
+      users: {},
+      partners: [],
+    };
+
+    let appData = loadAppData();
+    let activePlan = null;
+
+    function loadAppData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(initialCleanState);
+        const parsed = JSON.parse(raw);
+        return {
+          ...structuredClone(initialCleanState),
+          ...parsed,
+          users: typeof parsed.users === 'object' && parsed.users ? parsed.users : {},
+          partners: Array.isArray(parsed.partners) ? parsed.partners : [],
+        };
+      } catch (_) {
+        return structuredClone(initialCleanState);
+      }
+    }
+
+    function saveAppData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+    }
+
+    function getLoggedAdminUser() {
+      return localStorage.getItem(ADMIN_SESSION_KEY) || '';
+    }
+
+    function setLoggedAdminUser(username) {
+      if (username) localStorage.setItem(ADMIN_SESSION_KEY, username);
+      else localStorage.removeItem(ADMIN_SESSION_KEY);
+    }
+
+    function normalizeHandle(raw) {
+      return String(raw || '').trim();
+    }
+
+    function getActiveHandle() {
+      const current = normalizeHandle(appData.currentUser);
+      if (current) return current;
+      const keys = Object.keys(appData.users);
+      return keys.length > 0 ? keys[0] : '@seu_nome';
+    }
+
+    function ensureUserRecord(handle) {
+      const key = normalizeHandle(handle) || '@seu_nome';
+      if (!appData.users[key]) {
+        appData.users[key] = {
+          name: key,
+          isAdminPartner: false,
+          questions: [],
+        };
+      }
+      return appData.users[key];
+    }
+
+    function getActivePromptText() {
+      if (appData.mode === 'custom' && appData.customPrompt.trim()) {
+        return appData.customPrompt.trim();
+      }
+      return DEFAULT_PROMPT;
+    }
+
+    function getActiveCardBg() {
+      return appData.customCardBg || appData.defaultCardBg || '';
+    }
+
+    function buildShareUrl(handle, promptText) {
+      const cleanUser = normalizeHandle(handle) || '@seu_nome';
+      const url = new URL(window.location.href);
+      url.searchParams.set('u', cleanUser);
+      url.searchParams.set('q', promptText);
+      return url.toString();
+    }
+
+    function formatBRL(value) {
+      const num = Number(value) || 0;
+      return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = 'px-4 py-2.5 rounded-2xl bg-zinc-900/95 text-white text-xs font-extrabold border border-emerald-400/35 shadow-2xl';
+      el.textContent = message;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 2700);
+    }
+
+    function copyToClipboard(text, successMsg) {
+      if (!text) {
+        showToast('Nada para copiar.');
+        return;
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(
+          () => showToast(successMsg),
+          () => fallbackCopy(text, successMsg)
+        );
+      } else {
+        fallbackCopy(text, successMsg);
+      }
+    }
+
+    function fallbackCopy(text, successMsg) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      showToast(successMsg);
+    }
+
+    function updateHeaderBadge() {
+      const handle = getActiveHandle();
+      const record = appData.users[handle];
+      const count = record && Array.isArray(record.questions) ? record.questions.length : 0;
+      document.getElementById('headerInboxCount').textContent = String(count);
+    }
+
+    // Detecta ?u=...&q=... na URL para tela de resposta anônima
+    function checkUrlReplyMode() {
+      const params = new URLSearchParams(window.location.search);
+      const targetUser = normalizeHandle(params.get('u'));
+      const targetPrompt = params.get('q');
+
+      if (targetUser) {
+        ensureUserRecord(targetUser);
+        if (!appData.currentUser) {
+          appData.currentUser = targetUser;
+        }
+        saveAppData();
+        updateHeaderBadge();
+
+        document.getElementById('replyTargetUser').textContent = targetUser;
+        document.getElementById('replyPromptText').textContent =
+          (targetPrompt && targetPrompt.trim()) || DEFAULT_PROMPT;
+
+        document.getElementById('replyScreen').classList.remove('hidden');
+        document.getElementById('createScreen').classList.add('hidden');
+        document.getElementById('inboxScreen').classList.add('hidden');
+        document.getElementById('replySentBox').classList.add('hidden');
+        document.getElementById('anonymousReplyForm').classList.remove('hidden');
+        return true;
+      }
+      return false;
+    }
+
+    function switchTab(tabName) {
+      document.getElementById('replyScreen').classList.add('hidden');
+      document.getElementById('createScreen').classList.toggle('hidden', tabName !== 'create');
+      document.getElementById('inboxScreen').classList.toggle('hidden', tabName !== 'inbox');
+
+      document.querySelectorAll('.tab-btn').forEach((btn) => {
+        const active = btn.dataset.tab === tabName;
+        btn.className = `tab-btn px-3 py-1.5 rounded-xl text-xs font-extrabold transition ${
+          active
+            ? 'bg-emerald-400 text-zinc-950 shadow'
+            : 'text-zinc-400 hover:text-white'
+        }`;
+      });
+
+      if (tabName === 'inbox') {
+        renderInbox();
+      } else {
+        renderCreatorScreen();
+      }
+    }
+
+    function renderCreatorScreen() {
+      const displayHandle = normalizeHandle(appData.currentUser) || '@seu_nome';
+      const promptText = getActivePromptText();
+      const shareUrl = buildShareUrl(displayHandle, promptText);
+      const bgImgUrl = getActiveCardBg();
+
+      document.getElementById('creatorNameInput').value = appData.currentUser || '';
+      document.getElementById('customPromptInput').value = appData.customPrompt || '';
+      document.getElementById('customPromptWrapper').classList.toggle('hidden', appData.mode !== 'custom');
+
+      const presetBtn = document.getElementById('optPresetBtn');
+      const customBtn = document.getElementById('optCustomBtn');
+
+      presetBtn.className = `p-4 rounded-2xl text-left border transition space-y-1.5 ${
+        appData.mode === 'preset'
+          ? 'bg-emerald-400/15 border-emerald-400 shadow-lg shadow-emerald-500/10'
+          : 'bg-zinc-900 border-white/10 hover:border-white/25'
+      }`;
+
+      customBtn.className = `p-4 rounded-2xl text-left border transition space-y-1.5 ${
+        appData.mode === 'custom'
+          ? 'bg-sky-500/15 border-sky-400 shadow-lg shadow-sky-500/10'
+          : 'bg-zinc-900 border-white/10 hover:border-white/25'
+      }`;
+
+      document.getElementById('previewUserName').textContent = displayHandle;
+      document.getElementById('previewPromptText').textContent = promptText;
+      document.getElementById('generatedLinkInput').value = shareUrl;
+
+      const bgEl = document.getElementById('shareCardBgImg');
+      if (bgImgUrl) {
+        bgEl.src = bgImgUrl;
+        bgEl.classList.remove('hidden');
+      } else {
+        bgEl.removeAttribute('src');
+        bgEl.classList.add('hidden');
+      }
+
+      updateHeaderBadge();
+    }
+
+    function renderInbox() {
+      const handle = getActiveHandle();
+      const record = appData.users[handle] || { name: handle, isAdminPartner: false, questions: [] };
+      const questions = record.questions || [];
+
+      document.getElementById('inboxOwnerLabel').textContent = handle;
+      document.getElementById('headerInboxCount').textContent = String(questions.length);
+      document.getElementById('inboxListCount').textContent = `${questions.length} ${questions.length === 1 ? 'pergunta' : 'perguntas'}`;
+
+      document.getElementById('adminPartnerBadge').classList.toggle('hidden', !record.isAdminPartner);
+
+      const unlockedCount = questions.filter((q) => q.unlocked).length;
+      document.getElementById('inboxUnlockSummary').textContent =
+        `${unlockedCount} de ${questions.length} autor(es) revelado(s). Autores ocultos ficam bloqueados até o Pix.`;
+
+      const container = document.getElementById('inboxQuestionsContainer');
+      if (!questions.length) {
+        container.innerHTML = '<p class="text-sm text-zinc-500 text-center py-6">Nenhuma pergunta recebida ainda. Compartilhe seu link do BIGODE ANONIMO.</p>';
+        return;
+      }
+
+      container.innerHTML = questions
+        .map((q, idx) => {
+          const authorDisplay = q.unlocked
+            ? `<span class="text-xs font-extrabold text-emerald-400">Quem mandou: ${escapeHtml(q.author || 'Não informado')}</span>`
+            : `<button type="button" data-q-id="${escapeHtml(q.id)}" class="quick-unlock-10 text-xs font-extrabold px-3 py-1.5 rounded-xl bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-300 border border-emerald-400/35 transition">
+                 Autor oculto 🔒 • Ver por R$ 10
+               </button>`;
+
+          return `
+            <div class="rounded-2xl bg-zinc-900 border border-white/10 p-4 space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] text-zinc-500">
+                <span>Pergunta #${idx + 1}</span>
+                <span>${q.unlocked ? 'Revelada' : 'Bloqueada'}</span>
+              </div>
+              <p class="text-sm font-semibold text-white leading-relaxed">“${escapeHtml(q.text)}”</p>
+              <div class="pt-2 border-t border-white/5 flex items-center justify-between gap-2">
+                ${authorDisplay}
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+
+      container.querySelectorAll('.quick-unlock-10').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          openPlanCheckout('10', btn.dataset.qId);
+        });
+      });
+    }
+
+    // Gera e baixa imagem PNG do card do BIGODE ANONIMO
+    function downloadShareCardPng() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1350;
+      const ctx = canvas.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, 1080, 1350);
+      grad.addColorStop(0, '#052e2b');
+      grad.addColorStop(0.55, '#0c2340');
+      grad.addColorStop(1, '#1e1b0b');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1080, 1350);
+
+      const finishDraw = () => {
+        ctx.fillStyle = 'rgba(9, 9, 11, 0.45)';
+        ctx.fillRect(0, 0, 1080, 1350);
+
+        ctx.fillStyle = 'rgba(15, 18, 28, 0.85)';
+        ctx.strokeStyle = 'rgba(0, 255, 136, 0.45)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.roundRect(90, 320, 900, 700, 44);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#34d399';
+        ctx.font = '800 30px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('BIGODE ANONIMO', 540, 405);
+
+        const handleLabel = (normalizeHandle(appData.currentUser) || '@SEU_NOME').toUpperCase();
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '800 28px Inter, sans-serif';
+        ctx.fillText(`CAIXINHA DE ${handleLabel}`, 540, 455);
+
+        const promptText = getActivePromptText();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 50px Inter, sans-serif';
+        const words = promptText.split(' ');
+        const lines = [];
+        let line = '';
+        for (const w of words) {
+          const test = line ? `${line} ${w}` : w;
+          if (ctx.measureText(test).width > 780) {
+            lines.push(line);
+            line = w;
+          } else {
+            line = test;
+          }
+        }
+        if (line) lines.push(line);
+
+        let y = 565;
+        for (const l of lines.slice(0, 4)) {
+          ctx.fillText(l, 540, y);
+          y += 68;
+        }
+
+        ctx.fillStyle = '#00ff88';
+        ctx.beginPath();
+        ctx.roundRect(210, 865, 660, 84, 28);
+        ctx.fill();
+
+        ctx.fillStyle = '#09090b';
+        ctx.font = '900 26px Inter, sans-serif';
+        ctx.fillText('RESPONDA ANONIMAMENTE PELO LINK', 540, 916);
+
+        const link = document.createElement('a');
+        link.download = 'bigode-anonimo-caixinha.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Imagem PNG baixada!');
+      };
+
+      const bgSrc = getActiveCardBg();
+      if (bgSrc) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.globalAlpha = 0.45;
+          ctx.drawImage(img, 0, 0, 1080, 1350);
+          ctx.globalAlpha = 1;
+          finishDraw();
+        };
+        img.onerror = finishDraw;
+        img.src = bgSrc;
+      } else {
+        finishDraw();
+      }
+    }
+
+    function openPlanCheckout(planValue, preselectedQuestionId = '') {
+      activePlan = planValue;
+      const handle = getActiveHandle();
+      const record = appData.users[handle] || { questions: [] };
+      const pixKey = appData.pixKey.trim() || 'Chave Pix não configurada no painel ADM';
+      const waDigits = appData.whatsapp.replace(/\D/g, '');
+
+      const planMeta = {
+        '10': { title: 'BIGODE ANONIMO • 1 Pergunta', label: 'Ver quem mandou 1 pergunta específica', amount: 'R$ 10,00' },
+        '15': { title: 'BIGODE ANONIMO • 2 Perguntas', label: 'Desbloquear 2 perguntas', amount: 'R$ 15,00' },
+        '35': { title: 'BIGODE ANONIMO • Todas', label: 'Desbloquear todas as mensagens', amount: 'R$ 35,00' },
+        '50': { title: 'BIGODE ANONIMO • Conta ADM', label: 'Adquirir conta ADM e ganhar dinheiro', amount: 'R$ 50,00' },
+      };
+
+      const info = planMeta[planValue] || planMeta['10'];
+      document.getElementById('pixModalTitle').textContent = info.title;
+      document.getElementById('pixPlanLabel').textContent = `${info.label} (${handle})`;
+      document.getElementById('pixAmountBadge').textContent = info.amount;
+      document.getElementById('checkoutPixKeyInput').value = pixKey;
+
+      const selectWrap = document.getElementById('specificQuestionSelectWrap');
+      const selectEl = document.getElementById('specificQuestionSelect');
+
+      if (planValue === '10' && record.questions.length > 0) {
+        selectWrap.classList.remove('hidden');
+        selectEl.innerHTML = record.questions
+          .map((q, i) => `<option value="${escapeHtml(q.id)}">#${i + 1}: ${escapeHtml(q.text)}</option>`)
+          .join('');
+        if (preselectedQuestionId) {
+          selectEl.value = preselectedQuestionId;
+        }
+      } else {
+        selectWrap.classList.add('hidden');
+      }
+
+      const selectedQ = record.questions.find((q) => q.id === selectEl.value);
+      const detalhePergunta =
+        planValue === '10' && selectedQ ? ` Pergunta escolhida: "${selectedQ.text}".` : '';
+
+      const msgText = encodeURIComponent(
+        `Olá! Fiz o Pix de ${info.amount} no BIGODE ANONIMO para "${info.label}" (${handle}).${detalhePergunta} Segue meu extrato/comprovante!`
+      );
+
+      const waLink = document.getElementById('btnSendWhatsappProof');
+      waLink.href = waDigits
+        ? `https://wa.me/${waDigits}?text=${msgText}`
+        : `https://wa.me/?text=${msgText}`;
+
+      const modal = document.getElementById('pixCheckoutModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function openModalEl(id) {
+      const el = document.getElementById(id);
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+    }
+
+    function closeModalEl(id) {
+      const el = document.getElementById(id);
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    }
+
+    // Cálculo da árvore de afiliados e comissão sobre o lucro dos parceiros
+    function computeAffiliateMetrics() {
+      let totalPartnerGross = 0;
+      let totalCommission = 0;
+
+      appData.partners.forEach((p) => {
+        const gross = Number(p.earnings) || 0;
+        const pct = Math.min(100, Math.max(0, Number(p.commissionPct) || 0));
+        const comm = gross * (pct / 100);
+        totalPartnerGross += gross;
+        totalCommission += comm;
+      });
+
+      return {
+        totalPartnerGross,
+        totalCommission,
+        activeCount: appData.partners.length,
+      };
+    }
+
+    function renderAdminPanel() {
+      const loggedUser = getLoggedAdminUser() || MASTER_ADMIN_USER;
+      document.getElementById('loggedAdminLabel').textContent = loggedUser;
+      document.getElementById('adminPixInput').value = appData.pixKey || '';
+      document.getElementById('adminWhatsappInput').value = appData.whatsapp || '';
+
+      const metrics = computeAffiliateMetrics();
+      document.getElementById('totalPartnerGrossEl').textContent = formatBRL(metrics.totalPartnerGross);
+      document.getElementById('totalCommissionEl').textContent = formatBRL(metrics.totalCommission);
+      document.getElementById('totalPartnerCountEl').textContent = String(metrics.activeCount);
+
+      // Lista de parceiros ADM e árvore de indicação
+      const partnersBox = document.getElementById('adminPartnersList');
+      if (!appData.partners.length) {
+        partnersBox.innerHTML = '<p class="text-xs text-zinc-500">Nenhuma conta ADM parceira cadastrada ainda.</p>';
+      } else {
+        partnersBox.innerHTML = appData.partners
+          .map((p, idx) => {
+            const gross = Number(p.earnings) || 0;
+            const pct = Number(p.commissionPct) || 0;
+            const commValue = gross * (pct / 100);
+            const upline = p.upline || MASTER_ADMIN_USER;
+
+            return `
+              <div class="rounded-xl bg-zinc-900 border border-white/10 p-3 space-y-2.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p class="text-xs font-black text-white">
+                      ${escapeHtml(p.username)}
+                      <span class="ml-1.5 text-[11px] font-bold text-amber-300">• Indicado por: ${escapeHtml(upline)}</span>
+                    </p>
+                    <p class="text-[11px] text-zinc-400">
+                      Lucro do parceiro: <strong class="text-white">${formatBRL(gross)}</strong> •
+                      Sua comissão (${pct}%): <strong class="text-emerald-400">${formatBRL(commValue)}</strong>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    data-remove-partner="${idx}"
+                    class="remove-partner-btn px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-rose-500/20 text-zinc-400 hover:text-rose-300 text-[11px] font-bold transition"
+                  >
+                    Remover
+                  </button>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-white/5">
+                  <button
+                    type="button"
+                    data-add-sale="${idx}"
+                    data-amount="10"
+                    class="partner-sale-btn px-2.5 py-1 rounded-lg bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-300 text-[11px] font-extrabold"
+                  >
+                    +Venda R$ 10
+                  </button>
+                  <button
+                    type="button"
+                    data-add-sale="${idx}"
+                    data-amount="15"
+                    class="partner-sale-btn px-2.5 py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 text-[11px] font-extrabold"
+                  >
+                    +Venda R$ 15
+                  </button>
+                  <button
+                    type="button"
+                    data-add-sale="${idx}"
+                    data-amount="35"
+                    class="partner-sale-btn px-2.5 py-1 rounded-lg bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 text-[11px] font-extrabold"
+                  >
+                    +Venda R$ 35
+                  </button>
+                  <button
+                    type="button"
+                    data-add-sale="${idx}"
+                    data-amount="50"
+                    class="partner-sale-btn px-2.5 py-1 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-zinc-950 text-[11px] font-black"
+                  >
+                    +ADM R$ 50
+                  </button>
+                </div>
+              </div>
+            `;
+          })
+          .join('');
+
+        partnersBox.querySelectorAll('.partner-sale-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const pIdx = Number(btn.dataset.addSale);
+            const saleVal = Number(btn.dataset.amount) || 0;
+            if (appData.partners[pIdx]) {
+              appData.partners[pIdx].earnings = (Number(appData.partners[pIdx].earnings) || 0) + saleVal;
+              saveAppData();
+              renderAdminPanel();
+              showToast(`Venda de ${formatBRL(saleVal)} registrada!`);
+            }
+          });
+        });
+
+        partnersBox.querySelectorAll('.remove-partner-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const pIdx = Number(btn.dataset.removePartner);
+            appData.partners.splice(pIdx, 1);
+            saveAppData();
+            renderAdminPanel();
+            showToast('Conta ADM parceira removida.');
+          });
+        });
+      }
+
+      // Seletor de usuários com perguntas + desbloqueio/bloqueio manual
+      const handle = getActiveHandle();
+      document.getElementById('adminTargetUserLabel').textContent = handle;
+
+      const userHandles = Object.keys(appData.users);
+      const selectorBox = document.getElementById('adminUsersSelectorList');
+      selectorBox.innerHTML = userHandles
+        .map((uKey) => {
+          const selected = uKey === handle;
+          return `
+            <button
+              type="button"
+              data-pick-user="${escapeHtml(uKey)}"
+              class="admin-pick-user px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition ${
+                selected
+                  ? 'bg-sky-500 text-zinc-950'
+                  : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10'
+              }"
+            >
+              ${escapeHtml(uKey)}
+            </button>
+          `;
+        })
+        .join('');
+
+      selectorBox.querySelectorAll('.admin-pick-user').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          appData.currentUser = btn.dataset.pickUser;
+          saveAppData();
+          renderCreatorScreen();
+          renderInbox();
+          renderAdminPanel();
+        });
+      });
+
+      const record = appData.users[handle] || { questions: [] };
+      const qBox = document.getElementById('adminQuestionsContainer');
+      if (!record.questions.length) {
+        qBox.innerHTML = '<p class="text-xs text-zinc-500">Nenhuma pergunta registrada para este usuário.</p>';
+        return;
+      }
+
+      qBox.innerHTML = record.questions
+        .map((q, idx) => `
+          <div class="rounded-xl bg-zinc-900 border border-white/10 p-3 flex items-center justify-between gap-3">
+            <div class="min-w-0 space-y-0.5">
+              <p class="text-xs font-bold text-white truncate">#${idx + 1} • “${escapeHtml(q.text)}”</p>
+              <p class="text-[11px] text-zinc-400">
+                Autor: <strong class="text-zinc-200">${escapeHtml(q.author || 'Não informado')}</strong>
+              </p>
+            </div>
+            <button
+              type="button"
+              data-q-toggle="${escapeHtml(q.id)}"
+              class="admin-toggle-q shrink-0 px-3 py-1.5 rounded-xl text-xs font-extrabold transition ${
+                q.unlocked
+                  ? 'bg-zinc-800 hover:bg-zinc-700 text-amber-300'
+                  : 'bg-emerald-400 hover:bg-emerald-300 text-zinc-950'
+              }"
+            >
+              ${q.unlocked ? 'Bloquear' : 'Desbloquear'}
+            </button>
+          </div>
+        `)
+        .join('');
+
+      qBox.querySelectorAll('.admin-toggle-q').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const qObj = record.questions.find((item) => item.id === btn.dataset.qToggle);
+          if (!qObj) return;
+          qObj.unlocked = !qObj.unlocked;
+          saveAppData();
+          renderInbox();
+          renderAdminPanel();
+        });
+      });
+    }
+
+    // Eventos da interface
+    document.getElementById('brandHomeBtn').addEventListener('click', () => {
+      window.history.replaceState({}, '', window.location.pathname);
+      switchTab('create');
+    });
+
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    document.getElementById('creatorNameInput').addEventListener('input', (e) => {
+      const val = e.target.value;
+      appData.currentUser = val;
+      if (normalizeHandle(val)) {
+        ensureUserRecord(val);
+      }
+      saveAppData();
+      renderCreatorScreen();
+    });
+
+    document.getElementById('optPresetBtn').addEventListener('click', () => {
+      appData.mode = 'preset';
+      saveAppData();
+      renderCreatorScreen();
+    });
+
+    document.getElementById('optCustomBtn').addEventListener('click', () => {
+      appData.mode = 'custom';
+      saveAppData();
+      renderCreatorScreen();
+      document.getElementById('customPromptInput').focus();
+    });
+
+    document.getElementById('customPromptInput').addEventListener('input', (e) => {
+      appData.customPrompt = e.target.value;
+      saveAppData();
+      renderCreatorScreen();
+    });
+
+    document.getElementById('cardBgUpload').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        appData.customCardBg = String(reader.result || '');
+        saveAppData();
+        renderCreatorScreen();
+        showToast('Imagem aplicada ao card!');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('btnClearCardBg').addEventListener('click', () => {
+      appData.customCardBg = '';
+      document.getElementById('cardBgUpload').value = '';
+      saveAppData();
+      renderCreatorScreen();
+      showToast('Fundo padrão restaurado.');
+    });
+
+    document.getElementById('btnCopyShareLink').addEventListener('click', () => {
+      copyToClipboard(document.getElementById('generatedLinkInput').value, 'Link copiado!');
+    });
+
+    document.getElementById('btnDownloadCard').addEventListener('click', downloadShareCardPng);
+
+    document.getElementById('btnShareWaBox').addEventListener('click', () => {
+      const link = document.getElementById('generatedLinkInput').value;
+      const promptText = getActivePromptText();
+      const handle = normalizeHandle(appData.currentUser) || '@seu_nome';
+      const msg = encodeURIComponent(
+        `BIGODE ANONIMO • Caixinha de ${handle}: "${promptText}"\nResponda anonimamente aqui: ${link}`
+      );
+      window.open(`https://wa.me/?text=${msg}`, '_blank', 'noopener,noreferrer');
+    });
+
+    document.getElementById('btnShareSocialInfo').addEventListener('click', () => {
+      const link = document.getElementById('generatedLinkInput').value;
+      const promptText = getActivePromptText();
+      copyToClipboard(
+        `BIGODE ANONIMO — ${promptText} Responda anonimamente: ${link}`,
+        'Texto e link copiados para Insta/Face!'
+      );
+    });
+
+    document.getElementById('btnGoToInbox').addEventListener('click', () => switchTab('inbox'));
+
+    // Envio de pergunta anônima
+    document.getElementById('anonymousReplyForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const params = new URLSearchParams(window.location.search);
+      const targetHandle = normalizeHandle(params.get('u')) || getActiveHandle();
+      const msgInput = document.getElementById('anonMessageInput');
+      const authorInput = document.getElementById('anonAuthorInput');
+
+      const text = msgInput.value.trim();
+      const author = authorInput.value.trim() || 'Anônimo (não informou nome)';
+      if (!text) return;
+
+      const targetRecord = ensureUserRecord(targetHandle);
+      targetRecord.questions.unshift({
+        id: `q-${Date.now()}`,
+        text,
+        author,
+        unlocked: false,
+      });
+
+      saveAppData();
+      updateHeaderBadge();
+      msgInput.value = '';
+      authorInput.value = '';
+
+      document.getElementById('anonymousReplyForm').classList.add('hidden');
+      document.getElementById('replySentBox').classList.remove('hidden');
+      showToast('Pergunta anônima enviada no BIGODE ANONIMO!');
+    });
+
+    const goCreateFromReply = () => {
+      window.history.replaceState({}, '', window.location.pathname);
+      switchTab('create');
+    };
+
+    document.getElementById('btnReplyToCreate').addEventListener('click', goCreateFromReply);
+    document.getElementById('btnAfterSendCreateBox').addEventListener('click', goCreateFromReply);
+
+    // Simulador local de perguntas
+    document.getElementById('simQuestionForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const tInput = document.getElementById('simTextInput');
+      const aInput = document.getElementById('simAuthorInput');
+      const text = tInput.value.trim();
+      const author = aInput.value.trim() || 'Anônimo';
+      if (!text) return;
+
+      const handle = getActiveHandle();
+      const record = ensureUserRecord(handle);
+      record.questions.unshift({
+        id: `q-sim-${Date.now()}`,
+        text,
+        author,
+        unlocked: false,
+      });
+
+      saveAppData();
+      tInput.value = '';
+      aInput.value = '';
+      renderInbox();
+      renderCreatorScreen();
+      showToast('Pergunta adicionada!');
+    });
+
+    // Planos Pix R$ 10 / R$ 15 / R$ 35 / R$ 50
+    document.querySelectorAll('.open-plan-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        openPlanCheckout(btn.dataset.plan);
+      });
+    });
+
+    document.getElementById('specificQuestionSelect').addEventListener('change', () => {
+      if (activePlan === '10') {
+        openPlanCheckout('10', document.getElementById('specificQuestionSelect').value);
+      }
+    });
+
+    document.getElementById('closePixCheckoutModal').addEventListener('click', () => {
+      closeModalEl('pixCheckoutModal');
+    });
+
+    document.getElementById('btnCopyCheckoutPix').addEventListener('click', () => {
+      copyToClipboard(document.getElementById('checkoutPixKeyInput').value, 'Chave Pix copiada!');
+    });
+
+    // Gatilho discreto no rodapé para login ADM
+    document.getElementById('hiddenAdminDot').addEventListener('click', () => {
+      if (getLoggedAdminUser()) {
+        renderAdminPanel();
+        openModalEl('adminPanelModal');
+      } else {
+        document.getElementById('adminLoginErrorMsg').classList.add('hidden');
+        document.getElementById('adminLoginForm').reset();
+        openModalEl('adminLoginModal');
+      }
+    });
+
+    document.getElementById('closeAdminLoginModal').addEventListener('click', () => {
+      closeModalEl('adminLoginModal');
+    });
+
+    document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const u = document.getElementById('adminUserField').value.trim();
+      const p = document.getElementById('adminPassField').value;
+
+      const matchedPartner = appData.partners.find(
+        (item) => item.username === u && item.password === p
+      );
+
+      if ((u === MASTER_ADMIN_USER && p === MASTER_ADMIN_PASS) || matchedPartner) {
+        setLoggedAdminUser(u);
+        closeModalEl('adminLoginModal');
+        renderAdminPanel();
+        openModalEl('adminPanelModal');
+        showToast('Acesso ADM liberado no BIGODE ANONIMO!');
+      } else {
+        document.getElementById('adminLoginErrorMsg').classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('closeAdminPanelModal').addEventListener('click', () => {
+      closeModalEl('adminPanelModal');
+    });
+
+    document.getElementById('btnLogoutAdminPanel').addEventListener('click', () => {
+      setLoggedAdminUser('');
+      closeModalEl('adminPanelModal');
+      showToast('Sessão ADM encerrada.');
+    });
+
+    document.getElementById('adminSettingsForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      appData.pixKey = document.getElementById('adminPixInput').value.trim();
+      appData.whatsapp = document.getElementById('adminWhatsappInput').value.replace(/\D/g, '');
+      saveAppData();
+      renderCreatorScreen();
+      renderAdminPanel();
+      showToast('Configurações salvas!');
+    });
+
+    document.getElementById('adminDefaultBgUpload').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        appData.defaultCardBg = String(reader.result || '');
+        saveAppData();
+        renderCreatorScreen();
+        showToast('Imagem padrão salva!');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('btnClearAdminBg').addEventListener('click', () => {
+      appData.defaultCardBg = '';
+      document.getElementById('adminDefaultBgUpload').value = '';
+      saveAppData();
+      renderCreatorScreen();
+      showToast('Imagem padrão removida.');
+    });
+
+    // Cadastro de conta ADM parceira com árvore de afiliados e % de comissão
+    document.getElementById('addPartnerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('partnerUsernameInput').value.trim();
+      const password = document.getElementById('partnerPasswordInput').value;
+      const upline = document.getElementById('partnerUplineInput').value.trim() || MASTER_ADMIN_USER;
+      const commissionPct = Math.min(100, Math.max(0, Number(document.getElementById('partnerCommissionInput').value) || 0));
+
+      if (!username || !password) return;
+
+      appData.partners.push({
+        username,
+        password,
+        upline,
+        commissionPct,
+        earnings: 0,
+      });
+
+      const userRec = ensureUserRecord(username);
+      userRec.isAdminPartner = true;
+
+      saveAppData();
+      e.target.reset();
+      document.getElementById('partnerCommissionInput').value = '30';
+      renderAdminPanel();
+      renderInbox();
+      showToast(`Conta ADM "${username}" cadastrada!`);
+    });
+
+    // Desbloqueio / bloqueio manual de perguntas
+    document.getElementById('btnAdminUnlock1').addEventListener('click', () => {
+      const record = ensureUserRecord(getActiveHandle());
+      const nextLocked = record.questions.find((q) => !q.unlocked);
+      if (nextLocked) nextLocked.unlocked = true;
+      saveAppData();
+      renderInbox();
+      renderAdminPanel();
+      showToast('+1 pergunta desbloqueada.');
+    });
+
+    document.getElementById('btnAdminUnlock2').addEventListener('click', () => {
+      const record = ensureUserRecord(getActiveHandle());
+      let count = 0;
+      for (const q of record.questions) {
+        if (!q.unlocked) {
+          q.unlocked = true;
+          count++;
+          if (count === 2) break;
+        }
+      }
+      saveAppData();
+      renderInbox();
+      renderAdminPanel();
+      showToast(`+${count} pergunta(s) desbloqueada(s).`);
+    });
+
+    document.getElementById('btnAdminUnlockAll').addEventListener('click', () => {
+      const record = ensureUserRecord(getActiveHandle());
+      record.questions.forEach((q) => {
+        q.unlocked = true;
+      });
+      saveAppData();
+      renderInbox();
+      renderAdminPanel();
+      showToast('Todas as perguntas desbloqueadas!');
+    });
+
+    document.getElementById('btnAdminLockAll').addEventListener('click', () => {
+      const record = ensureUserRecord(getActiveHandle());
+      record.questions.forEach((q) => {
+        q.unlocked = false;
+      });
+      saveAppData();
+      renderInbox();
+      renderAdminPanel();
+      showToast('Todas as perguntas bloqueadas.');
+    });
+
+    // Inicialização
+    updateHeaderBadge();
+    const inReplyMode = checkUrlReplyMode();
+    if (!inReplyMode) {
+      switchTab('create');
+    }
+  </script>
+</body>
+</html>
