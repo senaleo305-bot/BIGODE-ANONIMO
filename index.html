@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIGODE ANONIMO</title>
+  <style>
+    :root {
+      --bg-main: #06090f;
+      --bg-card: #0d1320;
+      --bg-soft: #131c2e;
+      --border: #1e2d48;
+      --text-main: #f3f7ff;
+      --text-muted: #93a4c3;
+      --neon: #10f58c;
+      --neon-dark: #06b868;
+      --blue: #2998ff;
+      --gold: #ffd23f;
+      --danger: #ff4d6d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(16, 245, 140, 0.08), transparent 40%),
+        radial-gradient(circle at 85% 15%, rgba(41, 152, 255, 0.10), transparent 42%),
+        radial-gradient(circle at 50% 90%, rgba(255, 210, 63, 0.06), transparent 45%),
+        var(--bg-main);
+      color: var(--text-main);
+      padding: 20px 14px 44px;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: rgba(13, 19, 32, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--neon), var(--blue));
+      color: #04100a;
+      font-weight: 900;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand h1 {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      color: var(--text-main);
+    }
+
+    .brand span {
+      color: var(--gold);
+    }
+
+    .nav-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      background: var(--bg-soft);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .pill-btn.active,
+    .pill-btn:hover {
+      border-color: var(--neon);
+      color: var(--neon);
+    }
+
+    .card {
+      background: rgba(13, 19, 32, 0.94);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gold-tag {
+      color: var(--gold);
+    }
+
+    .blue-tag {
+      color: var(--blue);
+    }
+
+    .neon-tag {
+      color: var(--neon);
+    }
+
+    .muted {
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 16px;
+    }
+
+    .mode-box {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .mode-box.selected {
+      border-color: var(--neon);
+      box-shadow: 0 0 0 1px rgba(16, 245, 140, 0.35);
+    }
+
+    .mode-box h3 {
+      font-size: 15px;
+      margin-bottom: 6px;
+      color: var(--neon);
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 12px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      background: #080d17;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      border-radius: 11px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--blue);
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 11px;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-neon {
+      background: var(--neon);
+      color: #031109;
+    }
+
+    .btn-neon:hover {
+      background: var(--neon-dark);
+    }
+
+    .btn-blue {
+      background: var(--blue);
+      color: #ffffff;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #161000;
+    }
+
+    .btn-ghost {
+      background: var(--bg-soft);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      background: rgba(255, 77, 109, 0.16);
+      color: #ff859b;
+      border: 1px solid rgba(255, 77, 109, 0.35);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .canvas-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      background: #070b13;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    canvas {
+      max-width: 100%;
+      width: 320px;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+    }
+
+    .link-box {
+      background: #080d17;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--neon);
+      word-break: break-all;
+      margin-top: 10px;
+    }
+
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .plan-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .plan-price {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--gold);
+    }
+
+    .plan-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .msg-item {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .msg-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .locked-pill {
+      background: rgba(255, 210, 63, 0.16);
+      color: var(--gold);
+    }
+
+    .unlocked-pill {
+      background: rgba(16, 245, 140, 0.16);
+      color: var(--neon);
+    }
+
+    .pix-box {
+      background: #080d17;
+      border: 1px solid var(--gold);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .stat-box {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--neon);
+      margin-top: 4px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--neon);
+      color: #04120a;
+      font-weight: 800;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      z-index: 9999;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    .secret-footer {
+      margin-top: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .secret-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #1b273d;
+      border: 1px solid #2b3e61;
+      cursor: pointer;
+      opacity: 0.65;
+    }
+
+    .secret-dot:hover {
+      background: var(--gold);
+      opacity: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 9px 8px;
+      text-align: left;
+    }
+
+    th {
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-badge">BA</div>
+        <h1>BIGODE <span>ANONIMO</span></h1>
+      </div>
+      <div class="nav-pills">
+        <button class="pill-btn active" id="navStudio" onclick="showTab('studio')">Criar Caixinha</button>
+        <button class="pill-btn" id="navInbox" onclick="showTab('inbox')">Minhas Perguntas</button>
+        <button class="pill-btn hidden" id="navAdmin" onclick="showTab('admin')">Painel ADM</button>
+      </div>
+    </div>
+
+    <!-- TELA DE RESPOSTA ANÔNIMA (QUANDO ALGUÉM ABRE O LINK ?u=...) -->
+    <div id="askView" class="card hidden">
+      <div class="card-title">
+        Mandar mensagem anônima para <span class="neon-tag" id="askTargetName">@usuario</span>
+      </div>
+      <p class="muted" id="askPromptText">O QUE TEM PARA ME FALAR OU PERGUNTAR?</p>
+
+      <label for="anonQuestion">Sua pergunta ou mensagem anônima</label>
+      <textarea id="anonQuestion" placeholder="Escreva aqui o que você quer falar sem se identificar..."></textarea>
+
+      <label for="anonSenderHint">Seu nome / @ / pista (opcional — fica oculto até o dono desbloquear)</label>
+      <input type="text" id="anonSenderHint" placeholder="Ex: @fulano, alguém do trabalho, vizinho..." />
+
+      <div class="btn-row">
+        <button class="btn btn-neon" onclick="sendAnonymousQuestion()">Enviar Anônimo</button>
+      </div>
+
+      <div id="afterSendBox" class="pix-box hidden">
+        <div class="card-title neon-tag">Mensagem enviada com sucesso!</div>
+        <p class="muted">Agora que você mandou sua pergunta anônima, quer criar a sua própria caixinha para postar no Instagram, Facebook ou WhatsApp?</p>
+        <div class="btn-row">
+          <button class="btn btn-blue" onclick="goCreateOwnBox()">Criar Minha Caixinha Agora</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 1: CRIAR CAIXINHA + CARD PARA REDES SOCIAIS -->
+    <div id="studioView">
+      <div class="card">
+        <div class="card-title">1. Escolha como quer postar sua caixinha</div>
+        <p class="muted">Poste no Instagram, Facebook ou WhatsApp. Quem clicar no seu link abre o <strong>BIGODE ANONIMO</strong> já identificando seu nome/usuário.</p>
+
+        <div class="grid-2" style="margin-top: 14px;">
+          <div class="mode-box selected" id="modeReadyBox" onclick="selectMode('ready')">
+            <h3>Opção 1: Caixinha Pronta</h3>
+            <p class="muted">Usa a frase padrão direta: <strong>"O QUE TEM PARA ME FALAR OU PERGUNTAR?"</strong></p>
+          </div>
+          <div class="mode-box" id="modeCustomBox" onclick="selectMode('custom')">
+            <h3>Opção 2: Caixinha Personalizada</h3>
+            <p class="muted">Escreva a sua própria chamada ou pergunta para seus seguidores.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label for="creatorName">Seu Nome ou @usuário</label>
+            <input type="text" id="creatorName" placeholder="Ex: @bigode ou João" oninput="renderCardPreview()" />
+          </div>
+          <div>
+            <label for="bgUpload">Imagem de Fundo para Instagram / Face / WhatsApp</label>
+            <input type="file" id="bgUpload" accept="image/*" onchange="handleBgUpload(event)" />
+          </div>
+        </div>
+
+        <div id="customPromptWrap" class="hidden">
+          <label for="customPromptInput">Texto da Caixinha Personalizada</label>
+          <input type="text" id="customPromptInput" placeholder="Ex: Manda a real sem filtro! O que você acha de mim?" oninput="renderCardPreview()" />
+        </div>
+
+        <div class="link-box" id="generatedShareLink">Seu link de perguntas aparecerá aqui...</div>
+
+        <div class="btn-row">
+          <button class="btn btn-neon" onclick="copyShareLink()">Copiar Link</button>
+          <button class="btn btn-blue" onclick="shareWhatsAppLink()">Mandar Link no WhatsApp</button>
+          <button class="btn btn-gold" onclick="downloadCardPng()">Baixar Imagem do Card (PNG)</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">2. Prévia da Imagem para Instagram, Facebook e WhatsApp</div>
+        <p class="muted">Baixe a imagem abaixo e publique junto com o seu link nos Stories, Status, Feed ou grupos.</p>
+        <div class="canvas-wrap" style="margin-top: 12px;">
+          <canvas id="shareCanvas" width="720" height="900"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 2: MINHAS PERGUNTAS + PACOTES PIX -->
+    <div id="inboxView" class="hidden">
+      <div class="card">
+        <div class="card-title">Caixa de Perguntas — <span class="blue-tag" id="inboxCreatorLabel">Todos</span></div>
+        <p class="muted">Veja as mensagens recebidas e escolha um pacote para desbloquear quem enviou.</p>
+
+        <div class="plans-grid">
+          <div class="plan-card">
+            <div>
+              <div class="plan-title">Desbloquear 1 Pergunta Específica</div>
+              <div class="muted" style="margin-top:4px;">Revela quem mandou 1 mensagem escolhida.</div>
+            </div>
+            <div>
+              <div class="plan-price">R$ 10</div>
+              <button class="btn btn-neon" style="width:100%; margin-top:8px;" onclick="selectPlan('1 específica', 10)">Escolher R$ 10</button>
+            </div>
+          </div>
+
+          <div class="plan-card">
+            <div>
+              <div class="plan-title">Desbloquear 2 Perguntas</div>
+              <div class="muted" style="margin-top:4px;">Revela quem mandou até 2 mensagens.</div>
+            </div>
+            <div>
+              <div class="plan-price">R$ 15</div>
+              <button class="btn btn-blue" style="width:100%; margin-top:8px;" onclick="selectPlan('2 perguntas', 15)">Escolher R$ 15</button>
+            </div>
+          </div>
+
+          <div class="plan-card">
+            <div>
+              <div class="plan-title">Desbloquear Todas as Mensagens</div>
+              <div class="muted" style="margin-top:4px;">Libera a autoria de todas as perguntas.</div>
+            </div>
+            <div>
+              <div class="plan-price">R$ 35</div>
+              <button class="btn btn-gold" style="width:100%; margin-top:8px;" onclick="selectPlan('Todas as mensagens', 35)">Escolher R$ 35</button>
+            </div>
+          </div>
+
+          <div class="plan-card">
+            <div>
+              <div class="plan-title">Conta ADM + Rede de Afiliados</div>
+              <div class="muted" style="margin-top:4px;">Tenha seu painel ADM para lucrar e indicar.</div>
+            </div>
+            <div>
+              <div class="plan-price">R$ 50</div>
+              <button class="btn btn-neon" style="width:100%; margin-top:8px;" onclick="selectPlan('Conta ADM', 50)">Quero por R$ 50</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="pixCheckoutBox" class="pix-box hidden">
+          <div class="card-title gold-tag">Pagamento via Pix — <span id="selectedPlanLabel"></span></div>
+          <p class="muted">Copie a chave Pix abaixo, faça o pagamento no seu banco e mande o extrato/comprovante no WhatsApp para liberação.</p>
+          <div class="link-box" id="activePixKeyDisplay"></div>
+          <div class="btn-row">
+            <button class="btn btn-gold" onclick="copyPixKey()">Copiar Chave Pix</button>
+            <button class="btn btn-neon" onclick="sendReceiptWhatsApp()">Enviar Extrato no WhatsApp</button>
+          </div>
+        </div>
+
+        <div id="questionsList" style="margin-top: 16px;"></div>
+      </div>
+    </div>
+
+    <!-- ABA 3: PAINEL DO ADMINISTRADOR -->
+    <div id="adminView" class="hidden">
+      <div class="card">
+        <div class="card-title">Painel ADM — <span class="gold-tag" id="loggedAdminName">Bigode</span></div>
+        <p class="muted">Gerencie sua chave Pix, WhatsApp de comprovantes, desbloqueio de perguntas e árvore de afiliados de contas ADM.</p>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="muted">Total de Perguntas</div>
+            <div class="stat-val" id="statTotalQuestions">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="muted">Desbloqueadas</div>
+            <div class="stat-val" id="statUnlockedQuestions">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="muted">Seus Lucros Diretos</div>
+            <div class="stat-val" id="statDirectProfit">R$ 0,00</div>
+          </div>
+          <div class="stat-box">
+            <div class="muted">Comissão da Rede (Afiliados)</div>
+            <div class="stat-val" id="statAffiliateProfit">R$ 0,00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Configurações de Pagamento & Afiliados</div>
+        <div class="grid-2">
+          <div>
+            <label for="cfgPixKey">Sua Chave Pix (Copia e Cola / Celular / E-mail / Aleatória)</label>
+            <input type="text" id="cfgPixKey" placeholder="Cole sua chave Pix aqui..." />
+          </div>
+          <div>
+            <label for="cfgWhatsapp">Seu WhatsApp (com DDD, só números)</label>
+            <input type="text" id="cfgWhatsapp" placeholder="Ex: 5511999999999" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label for="cfgAffiliatePct">Sua % sobre o que cada ADM afiliado lucrar</label>
+            <input type="number" id="cfgAffiliatePct" min="0" max="100" step="1" placeholder="Ex: 20" />
+          </div>
+          <div>
+            <label for="cfgDirectRevenue">Registrar Valor Recebido no Pix (R$)</label>
+            <input type="number" id="cfgRevenueInput" min="0" step="0.01" placeholder="Ex: 10, 15, 35 ou 50" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-neon" onclick="saveAdminConfig()">Salvar Configurações</button>
+          <button class="btn btn-gold" onclick="addDirectRevenue()">Lançar Recebimento Pix</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Desbloquear / Bloquear Perguntas</div>
+        <div id="adminQuestionsList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Árvore de Afiliados — Contas ADM Vendidas (R$ 50)</div>
+        <p class="muted">Cadastre novos logins de ADM vendidos e acompanhe quem indicou quem e quanto você ganha em cima do que eles lucrarem.</p>
+
+        <div class="grid-2">
+          <div>
+            <label for="affUsername">Login / Usuário do Novo ADM</label>
+            <input type="text" id="affUsername" placeholder="Ex: adm_parceiro1" />
+          </div>
+          <div>
+            <label for="affPassword">Senha do Novo ADM</label>
+            <input type="text" id="affPassword" placeholder="Defina uma senha" />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label for="affUpline">Indicado por (Upline na Árvore)</label>
+            <select id="affUpline">
+              <option value="Bigode">Bigode (Você - Raiz)</option>
+            </select>
+          </div>
+          <div>
+            <label for="affEarned">Lucro Gerado por esse ADM (R$)</label>
+            <input type="number" id="affEarned" min="0" step="0.01" placeholder="0.00" />
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-blue" onclick="createAffiliateAdmin()">Criar Conta ADM na Árvore</button>
+          <button class="btn btn-ghost" onclick="logoutAdmin()">Sair do ADM</button>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>ADM</th>
+                <th>Indicado Por</th>
+                <th>Lucro do ADM</th>
+                <th>Sua Comissão</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="affiliatesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE LOGIN ADM -->
+    <div id="loginModal" class="card hidden">
+      <div class="card-title gold-tag">Acesso Administrativo</div>
+      <p class="muted">Digite seu usuário e senha para acessar o painel.</p>
+      <label for="loginUser">Usuário</label>
+      <input type="text" id="loginUser" placeholder="Usuário" />
+      <label for="loginPass">Senha</label>
+      <input type="password" id="loginPass" placeholder="Senha" />
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="doAdminLogin()">Entrar</button>
+        <button class="btn btn-ghost" onclick="closeLoginModal()">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="secret-footer">
+      <span>BIGODE ANONIMO</span>
+      <button class="secret-dot" title="ADM" onclick="openLoginModal()"></button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script>
+    const STORAGE_KEY = 'bigode_anonimo_data_v1';
+    const DEFAULT_PROMPT = 'O QUE TEM PARA ME FALAR OU PERGUNTAR?';
+
+    const defaultData = {
+      config: {
+        pixKey: '',
+        whatsapp: '',
+        affiliatePct: 20,
+        directRevenue: 0
+      },
+      questions: [],
+      affiliates: [],
+      customBgDataUrl: ''
+    };
+
+    let state = loadState();
+    let currentMode = 'ready';
+    let selectedPlan = null;
+    let currentSessionAdmin = null;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(defaultData);
+        const parsed = JSON.parse(raw);
+        return {
+          config: { ...defaultData.config, ...(parsed.config || {}) },
+          questions: Array.isArray(parsed.questions) ? parsed.questions : [],
+          affiliates: Array.isArray(parsed.affiliates) ? parsed.affiliates : [],
+          customBgDataUrl: parsed.customBgDataUrl || ''
+        };
+      } catch {
+        return structuredClone(defaultData);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.classList.add('hidden'), 2600);
+    }
+
+    function selectMode(mode) {
+      currentMode = mode;
+      document.getElementById('modeReadyBox').classList.toggle('selected', mode === 'ready');
+      document.getElementById('modeCustomBox').classList.toggle('selected', mode === 'custom');
+      document.getElementById('customPromptWrap').classList.toggle('hidden', mode !== 'custom');
+      renderCardPreview();
+    }
+
+    function getActivePrompt() {
+      if (currentMode === 'ready') return DEFAULT_PROMPT;
+      const custom = document.getElementById('customPromptInput').value.trim();
+      return custom || DEFAULT_PROMPT;
+    }
+
+    function getTargetUser() {
+      const val = document.getElementById('creatorName').value.trim();
+      return val || 'usuario';
+    }
+
+    function buildShareUrl() {
+      const base = window.location.href.split('?')[0];
+      const u = encodeURIComponent(getTargetUser());
+      const q = encodeURIComponent(getActivePrompt());
+      return `${base}?u=${u}&q=${q}`;
+    }
+
+    function handleBgUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        state.customBgDataUrl = reader.result;
+        saveState();
+        renderCardPreview();
+        showToast('Imagem de fundo carregada!');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && i > 0) {
+          ctx.fillText(line.trim(), x, currentY);
+          line = words[i] + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line.trim(), x, currentY);
+      return currentY;
+    }
+
+    function drawCardBase(ctx, w, h, userLabel, promptText) {
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#060a12');
+      grad.addColorStop(0.5, '#0c1629');
+      grad.addColorStop(1, '#07111a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(16, 245, 140, 0.35)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(26, 26, w - 52, h - 52);
+
+      ctx.fillStyle = '#10f58c';
+      ctx.font = '900 26px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('BIGODE ANONIMO', w / 2, 95);
+
+      ctx.fillStyle = '#ffd23f';
+      ctx.font = '800 24px Inter, sans-serif';
+      ctx.fillText(`PARA: ${userLabel}`, w / 2, 145);
+
+      ctx.fillStyle = '#111a2e';
+      ctx.fillRect(64, 210, w - 128, 430);
+      ctx.strokeStyle = '#2998ff';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(64, 210, w - 128, 430);
+
+      ctx.fillStyle = '#f3f7ff';
+      ctx.font = '900 38px Inter, sans-serif';
+      wrapCanvasText(ctx, promptText, w / 2, 330, w - 170, 52);
+
+      ctx.fillStyle = '#93a4c3';
+      ctx.font = '700 22px Inter, sans-serif';
+      ctx.fillText('CLIQUE NO LINK E MANDE SUA PERGUNTA', w / 2, 735);
+
+      ctx.fillStyle = '#2998ff';
+      ctx.font = '800 20px Inter, sans-serif';
+      ctx.fillText('INSTAGRAM • FACEBOOK • WHATSAPP', w / 2, 785);
+    }
+
+    function renderCardPreview() {
+      const canvas = document.getElementById('shareCanvas');
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const userLabel = getTargetUser();
+      const promptText = getActivePrompt();
+
+      document.getElementById('generatedShareLink').textContent = buildShareUrl();
+      document.getElementById('inboxCreatorLabel').textContent = userLabel;
+
+      if (state.customBgDataUrl) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, w, h);
+          ctx.fillStyle = 'rgba(5, 9, 17, 0.68)';
+          ctx.fillRect(0, 0, w, h);
+
+          ctx.strokeStyle = 'rgba(16, 245, 140, 0.45)';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(26, 26, w - 52, h - 52);
+
+          ctx.fillStyle = '#10f58c';
+          ctx.font = '900 26px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('BIGODE ANONIMO', w / 2, 95);
+
+          ctx.fillStyle = '#ffd23f';
+          ctx.font = '800 24px Inter, sans-serif';
+          ctx.fillText(`PARA: ${userLabel}`, w / 2, 145);
+
+          ctx.fillStyle = 'rgba(13, 19, 32, 0.86)';
+          ctx.fillRect(64, 210, w - 128, 430);
+          ctx.strokeStyle = '#2998ff';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(64, 210, w - 128, 430);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '900 38px Inter, sans-serif';
+          wrapCanvasText(ctx, promptText, w / 2, 330, w - 170, 52);
+
+          ctx.fillStyle = '#f3f7ff';
+          ctx.font = '700 22px Inter, sans-serif';
+          ctx.fillText('CLIQUE NO LINK E MANDE SUA PERGUNTA', w / 2, 735);
+
+          ctx.fillStyle = '#10f58c';
+          ctx.font = '800 20px Inter, sans-serif';
+          ctx.fillText('INSTAGRAM • FACEBOOK • WHATSAPP', w / 2, 785);
+        };
+        img.src = state.customBgDataUrl;
+      } else {
+        drawCardBase(ctx, w, h, userLabel, promptText);
+      }
+    }
+
+    function copyShareLink() {
+      const url = buildShareUrl();
+      navigator.clipboard?.writeText(url);
+      showToast('Link copiado!');
+    }
+
+    function shareWhatsAppLink() {
+      const url = buildShareUrl();
+      const text = encodeURIComponent(`${getActivePrompt()} Manda anônimo aqui: ${url}`);
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    }
+
+    function downloadCardPng() {
+      const canvas = document.getElementById('shareCanvas');
+      const link = document.createElement('a');
+      link.download = `bigode-anonimo-${getTargetUser().replace(/[^a-zA-Z0-9_-]/g, '') || 'card'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('Imagem PNG baixada!');
+    }
+
+    function checkUrlAskMode() {
+      const params = new URLSearchParams(window.location.search);
+      const targetUser = params.get('u');
+      const prompt = params.get('q');
+      if (targetUser) {
+        document.getElementById('askTargetName').textContent = decodeURIComponent(targetUser);
+        document.getElementById('askPromptText').textContent = prompt ? decodeURIComponent(prompt) : DEFAULT_PROMPT;
+        document.getElementById('askView').classList.remove('hidden');
+        document.getElementById('studioView').classList.add('hidden');
+        document.getElementById('inboxView').classList.add('hidden');
+      }
+    }
+
+    function sendAnonymousQuestion() {
+      const params = new URLSearchParams(window.location.search);
+      const targetUser = params.get('u') ? decodeURIComponent(params.get('u')) : getTargetUser();
+      const questionText = document.getElementById('anonQuestion').value.trim();
+      const senderHint = document.getElementById('anonSenderHint').value.trim() || 'Autor oculto / pista não informada';
+
+      if (!questionText) {
+        showToast('Escreva uma pergunta antes de enviar.');
+        return;
+      }
+
+      state.questions.unshift({
+        id: 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        targetUser,
+        text: questionText,
+        sender: senderHint,
+        unlocked: false,
+        createdAt: new Date().toLocaleString('pt-BR')
+      });
+
+      saveState();
+      document.getElementById('anonQuestion').value = '';
+      document.getElementById('anonSenderHint').value = '';
+      document.getElementById('afterSendBox').classList.remove('hidden');
+      showToast('Pergunta anônima enviada!');
+      renderQuestions();
+      renderAdmin();
+    }
+
+    function goCreateOwnBox() {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      document.getElementById('askView').classList.add('hidden');
+      document.getElementById('afterSendBox').classList.add('hidden');
+      showTab('studio');
+    }
+
+    function showTab(tab) {
+      document.getElementById('studioView').classList.toggle('hidden', tab !== 'studio');
+      document.getElementById('inboxView').classList.toggle('hidden', tab !== 'inbox');
+      document.getElementById('adminView').classList.toggle('hidden', tab !== 'admin');
+      document.getElementById('loginModal').classList.add('hidden');
+
+      document.getElementById('navStudio').classList.toggle('active', tab === 'studio');
+      document.getElementById('navInbox').classList.toggle('active', tab === 'inbox');
+      document.getElementById('navAdmin').classList.toggle('active', tab === 'admin');
+
+      if (tab === 'inbox') renderQuestions();
+      if (tab === 'admin') renderAdmin();
+    }
+
+    function selectPlan(label, price) {
+      selectedPlan = { label, price };
+      document.getElementById('selectedPlanLabel').textContent = `${label} — R$ ${price},00`;
+      document.getElementById('activePixKeyDisplay').textContent =
+        state.config.pixKey ? state.config.pixKey : 'Chave Pix ainda não configurada pelo ADM.';
+      document.getElementById('pixCheckoutBox').classList.remove('hidden');
+      document.getElementById('pixCheckoutBox').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyPixKey() {
+      if (!state.config.pixKey) {
+        showToast('Nenhuma chave Pix cadastrada.');
+        return;
+      }
+      navigator.clipboard?.writeText(state.config.pixKey);
+      showToast('Chave Pix copiada!');
+    }
+
+    function sendReceiptWhatsApp() {
+      const phone = (state.config.whatsapp || '').replace(/\D/g, '');
+      const planText = selectedPlan ? `${selectedPlan.label} (R$ ${selectedPlan.price},00)` : 'desbloqueio';
+      const msg = encodeURIComponent(`Olá! Fiz o Pix referente a ${planText} no BIGODE ANONIMO e estou enviando o comprovante.`);
+      if (!phone) {
+        showToast('WhatsApp do ADM ainda não configurado.');
+        return;
+      }
+      window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+    }
+
+    function renderQuestions() {
+      const list = document.getElementById('questionsList');
+      if (!state.questions.length) {
+        list.innerHTML = `<p class="muted" style="margin-top:12px;">Nenhuma pergunta recebida ainda. Compartilhe seu link no Instagram, Facebook ou WhatsApp.</p>`;
+        return;
+      }
+
+      list.innerHTML = state.questions.map(q => `
+        <div class="msg-item">
+          <div class="msg-header">
+            <span>Para: <strong>${escapeHtml(q.targetUser)}</strong> • ${escapeHtml(q.createdAt)}</span>
+            <span class="status-pill ${q.unlocked ? 'unlocked-pill' : 'locked-pill'}">
+              ${q.unlocked ? 'AUTORIA LIBERADA' : 'BLOQUEADO (R$ 10)'}
+            </span>
+          </div>
+          <div style="font-size:15px; font-weight:700; margin-bottom:8px;">"${escapeHtml(q.text)}"</div>
+          <div class="muted">
+            Quem mandou: ${q.unlocked
+              ? `<strong style="color:var(--neon);">${escapeHtml(q.sender)}</strong>`
+              : `<span style="color:var(--gold);">Oculto — pague R$ 10 no Pix e mande o extrato no WhatsApp para liberar</span>`
+            }
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.remove('hidden');
+      document.getElementById('loginModal').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.add('hidden');
+    }
+
+    function doAdminLogin() {
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value;
+
+      if (u === 'Bigode' && p === 'Leo.221904') {
+        currentSessionAdmin = 'Bigode';
+        document.getElementById('loggedAdminName').textContent = 'Bigode';
+        document.getElementById('navAdmin').classList.remove('hidden');
+        document.getElementById('loginUser').value = '';
+        document.getElementById('loginPass').value = '';
+        showToast('Login ADM realizado!');
+        showTab('admin');
+        return;
+      }
+
+      const partner = state.affiliates.find(a => a.username === u && a.password === p);
+      if (partner) {
+        currentSessionAdmin = partner.username;
+        document.getElementById('loggedAdminName').textContent = partner.username;
+        document.getElementById('navAdmin').classList.remove('hidden');
+        document.getElementById('loginUser').value = '';
+        document.getElementById('loginPass').value = '';
+        showToast(`Bem-vindo, ${partner.username}!`);
+        showTab('admin');
+        return;
+      }
+
+      showToast('Usuário ou senha inválidos.');
+    }
+
+    function logoutAdmin() {
+      currentSessionAdmin = null;
+      document.getElementById('navAdmin').classList.add('hidden');
+      showTab('studio');
+      showToast('Sessão encerrada.');
+    }
+
+    function saveAdminConfig() {
+      state.config.pixKey = document.getElementById('cfgPixKey').value.trim();
+      state.config.whatsapp = document.getElementById('cfgWhatsapp').value.trim().replace(/\D/g, '');
+      const pct = Number(document.getElementById('cfgAffiliatePct').value);
+      state.config.affiliatePct = Number.isFinite(pct) ? Math.max(0, Math.min(100, pct)) : 20;
+      saveState();
+      renderAdmin();
+      showToast('Configurações salvas!');
+    }
+
+    function addDirectRevenue() {
+      const val = Number(document.getElementById('cfgRevenueInput').value);
+      if (!Number.isFinite(val) || val <= 0) {
+        showToast('Digite um valor válido em R$.');
+        return;
+      }
+      state.config.directRevenue = Number(state.config.directRevenue || 0) + val;
+      document.getElementById('cfgRevenueInput').value = '';
+      saveState();
+      renderAdmin();
+      showToast(`Recebimento de R$ ${val.toFixed(2)} lançado!`);
+    }
+
+    function toggleQuestionUnlock(id) {
+      const q = state.questions.find(item => item.id === id);
+      if (!q) return;
+      q.unlocked = !q.unlocked;
+      saveState();
+      renderAdmin();
+      renderQuestions();
+      showToast(q.unlocked ? 'Pergunta desbloqueada!' : 'Pergunta bloqueada.');
+    }
+
+    function deleteQuestion(id) {
+      state.questions = state.questions.filter(item => item.id !== id);
+      saveState();
+      renderAdmin();
+      renderQuestions();
+      showToast('Pergunta removida.');
+    }
+
+    function createAffiliateAdmin() {
+      const username = document.getElementById('affUsername').value.trim();
+      const password = document.getElementById('affPassword').value.trim();
+      const upline = document.getElementById('affUpline').value;
+      const earned = Number(document.getElementById('affEarned').value) || 0;
+
+      if (!username || !password) {
+        showToast('Preencha usuário e senha do novo ADM.');
+        return;
+      }
+
+      if (username === 'Bigode' || state.affiliates.some(a => a.username.toLowerCase() === username.toLowerCase())) {
+        showToast('Esse usuário ADM já existe.');
+        return;
+      }
+
+      state.affiliates.push({
+        id: 'aff_' + Date.now(),
+        username,
+        password,
+        upline,
+        earned: Math.max(0, earned)
+      });
+
+      document.getElementById('affUsername').value = '';
+      document.getElementById('affPassword').value = '';
+      document.getElementById('affEarned').value = '';
+      saveState();
+      renderAdmin();
+      showToast('Conta ADM adicionada à árvore!');
+    }
+
+    function updateAffiliateEarned(id) {
+      const input = document.getElementById(`earn_input_${id}`);
+      const val = Number(input.value);
+      const aff = state.affiliates.find(a => a.id === id);
+      if (!aff || !Number.isFinite(val) || val < 0) {
+        showToast('Valor inválido.');
+        return;
+      }
+      aff.earned = val;
+      saveState();
+      renderAdmin();
+      showToast('Lucro do ADM atualizado!');
+    }
+
+    function removeAffiliate(id) {
+      state.affiliates = state.affiliates.filter(a => a.id !== id);
+      saveState();
+      renderAdmin();
+      showToast('Conta ADM removida.');
+    }
+
+    function renderAdmin() {
+      document.getElementById('cfgPixKey').value = state.config.pixKey || '';
+      document.getElementById('cfgWhatsapp').value = state.config.whatsapp || '';
+      document.getElementById('cfgAffiliatePct').value = state.config.affiliatePct ?? 20;
+
+      const totalQ = state.questions.length;
+      const unlockedQ = state.questions.filter(q => q.unlocked).length;
+      const pct = Number(state.config.affiliatePct || 0) / 100;
+
+      const affiliateCommission = state.affiliates.reduce((acc, a) => {
+        const directCut = Number(a.earned || 0) * pct;
+        return acc + directCut;
+      }, 0);
+
+      document.getElementById('statTotalQuestions').textContent = totalQ;
+      document.getElementById('statUnlockedQuestions').textContent = unlockedQ;
+      document.getElementById('statDirectProfit').textContent = `R$ ${Number(state.config.directRevenue || 0).toFixed(2)}`;
+      document.getElementById('statAffiliateProfit').textContent = `R$ ${affiliateCommission.toFixed(2)}`;
+
+      const uplineSelect = document.getElementById('affUpline');
+      uplineSelect.innerHTML = `<option value="Bigode">Bigode (Você - Raiz)</option>` +
+        state.affiliates.map(a => `<option value="${escapeHtml(a.username)}">${escapeHtml(a.username)}</option>`).join('');
+
+      const qAdminList = document.getElementById('adminQuestionsList');
+      if (!state.questions.length) {
+        qAdminList.innerHTML = `<p class="muted" style="margin-top:10px;">Nenhuma pergunta registrada até o momento.</p>`;
+      } else {
+        qAdminList.innerHTML = state.questions.map(q => `
+          <div class="msg-item">
+            <div class="msg-header">
+              <span><strong>${escapeHtml(q.targetUser)}</strong> • ${escapeHtml(q.createdAt)}</span>
+              <span class="status-pill ${q.unlocked ? 'unlocked-pill' : 'locked-pill'}">
+                ${q.unlocked ? 'DESBLOQUEADA' : 'BLOQUEADA'}
+              </span>
+            </div>
+            <div style="margin-bottom:6px;"><strong>Pergunta:</strong> ${escapeHtml(q.text)}</div>
+            <div class="muted" style="margin-bottom:10px;"><strong>Autor:</strong> ${escapeHtml(q.sender)}</div>
+            <div class="btn-row" style="margin-top:0;">
+              <button class="btn ${q.unlocked ? 'btn-ghost' : 'btn-neon'}" onclick="toggleQuestionUnlock('${q.id}')">
+                ${q.unlocked ? 'Bloquear' : 'Desbloquear'}
+              </button>
+              <button class="btn btn-danger" onclick="deleteQuestion('${q.id}')">Excluir</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const tbody = document.getElementById('affiliatesTableBody');
+      if (!state.affiliates.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="muted">Nenhuma conta ADM afiliada cadastrada ainda.</td></tr>`;
+      } else {
+        tbody.innerHTML = state.affiliates.map(a => {
+          const com = (Number(a.earned || 0) * pct).toFixed(2);
+          return `
+            <tr>
+              <td><strong>${escapeHtml(a.username)}</strong><br><span class="muted">Senha: ${escapeHtml(a.password)}</span></td>
+              <td>${escapeHtml(a.upline)}</td>
+              <td>
+                <input id="earn_input_${a.id}" type="number" step="0.01" min="0" value="${Number(a.earned || 0)}" style="width:105px; padding:6px 8px;" />
+              </td>
+              <td style="color:var(--neon); font-weight:800;">R$ ${com}</td>
+              <td>
+                <div class="btn-row" style="margin-top:0;">
+                  <button class="btn btn-blue" style="padding:6px 10px; font-size:12px;" onclick="updateAffiliateEarned('${a.id}')">Salvar</button>
+                  <button class="btn btn-danger" style="padding:6px 10px; font-size:12px;" onclick="removeAffiliate('${a.id}')">X</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    checkUrlAskMode();
+    renderCardPreview();
+    renderQuestions();
+    renderAdmin();
+  </script>
+</body>
+</html>
